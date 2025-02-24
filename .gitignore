@@ -1,0 +1,48 @@
+# Django
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+db.sqlite3
+*.log
+*.pot
+*.py[co]
+local_settings.py
+.env
+*.env
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Django static and media files
+/static/
+media/
+
+# macOS
+.DS_Store
+
+# IDE/Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+
+# Test-related files
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage/
+
+# Miscellaneous
+*.lock
