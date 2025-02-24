@@ -56,6 +56,10 @@ INSTALLED_APPS = [
     # swagger packages
     'rest_framework_swagger',
     'drf_yasg', 
+
+    # elasticsearch
+    "django_elasticsearch_dsl",
+
 ]
 
 MIDDLEWARE = [
@@ -103,6 +107,13 @@ DATABASES = {
         'HOST': env('DB_HOST'),  
         'PORT': env('DB_PORT'),      
     }
+}
+
+# Elasticsearch settings
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': ['localhost:9200'],
+    },
 }
 
 
