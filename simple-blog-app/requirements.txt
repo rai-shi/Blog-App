@@ -1,6 +1,10 @@
 django
 djangorestframework
+django-cors-headers
 django-rest-swagger
 psycopg2 # postgresql adapter
 elasticsearch[async]
 asyncio
+django-environ
+psycopg2-binary
+drf-yasg
