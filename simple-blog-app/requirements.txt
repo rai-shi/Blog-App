@@ -1,0 +1,6 @@
+django
+djangorestframework
+django-rest-swagger
+psycopg2 # postgresql adapter
+elasticsearch[async]
+asyncio
