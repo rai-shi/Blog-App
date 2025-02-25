@@ -105,6 +105,7 @@ class CreateBlogView(APIView):
         data["author"] = request.user.id
         serializer = BlogDetailSerializer(data=data)
         if serializer.is_valid():
+            print(serializer.validated_data)
             serializer.save()
             return Response(
                 serializer.data, 

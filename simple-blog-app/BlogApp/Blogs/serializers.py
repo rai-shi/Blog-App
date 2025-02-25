@@ -5,41 +5,43 @@ from .models import Blog, Category, Comment, Like
 
 
 class BlogDetailSerializer(serializers.ModelSerializer):
-    categories = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), many=True)
+    categories = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        many=True,
+        write_only=True  
+    )
+    category_names = serializers.SerializerMethodField()  
+    author_name = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Blog
         fields = "__all__"
         extra_kwargs = {
-            "slug": {"read_only": True}
+            "slug": {"read_only": True},
+            "category_names": {"read_only": True},
+            "author_name": {"read_only": True},
+            "author": {"write_only": True}
         }
 
-    def get_categories(self, obj):
-        my_list = [category.name for category in obj.categories.all()]
-        print(my_list)
-        return my_list
-    
-    def create(self, validated_data):
-        categories_data = validated_data.pop('categories', [])
-        blog = Blog.objects.create(**validated_data)
-        blog.categories.set(categories_data)  
-        return blog
+    def get_category_names(self, obj):
+        return [{"name":category.name, "id":category.id} for category in obj.categories.all()]
+    def get_author_name(self, obj):
+        return {"name":obj.author.username, "id":obj.author.id}
 
-    def update(self, instance, validated_data):
-        categories_data = validated_data.pop('categories', [])
-        instance = super().update(instance, validated_data)
-        instance.categories.set(categories_data)  
-        return instance
 
 # for getting all blogs
 class BlogsSerializer(serializers.ModelSerializer):
     categories = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField()
     class Meta:
         model = Blog
-        fields = ["slug", "title", "description", "categories", "created_at"]
+        fields = ["author", "slug", "title", "description", "categories", "created_at"]
 
     def get_categories(self, obj):
         return [category.name for category in obj.categories.all()]
+    def get_author(self, obj):
+        return obj.author.username
 
 
 class CategorySerializer(serializers.ModelSerializer):
