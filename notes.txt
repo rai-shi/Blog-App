@@ -1,0 +1,80 @@
+user/register POST
+{
+    "username": "raishi",
+    "first_name": "ayse",
+    "last_name": "tak",
+    "email": "ayse1@gmail.com",
+    "password": "930615Fly"
+}
+
+user/login POST
+{
+    "username": "raishi",
+    "password": "930615Fly"
+}
+
+user/logout GET
+
+category/
+{
+    "name" : "tech"
+}
+
+user/my-blogs/new-story/
+{
+    "title":"Elasticsearh Nedir?",
+    "description": "Lorem ipsum dolor sit amet",
+    "content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu maximus urna, eu dapibus tortor. In hac habitasse platea dictumst. Fusce sagittis vestibulum tristique. Nunc hendrerit dolor est, sed euismod velit blandit vitae. Duis accumsan eget tortor sit amet aliquet. Integer et magna enim. Aenean egestas orci vel turpis suscipit egestas. Morbi vestibulum tempor viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis at enim ac metus sodales auctor ut sit amet risus. Nunc imperdiet nec felis ullamcorper laoreet. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nulla rhoncus augue a massa maximus, quis facilisis lectus dignissim. Praesent molestie lacus eget tortor semper, id eleifend urna hendrerit. Nam vel blandit mi, at feugiat ex.",
+    "categories":[1,2]
+}
+{
+    "title":"Lorem Ipsum Nedir?",
+    "description": "Quisque eu est sit amet lorem auctor dignissim!",
+    "content":"Quisque eu est sit amet lorem auctor dignissim. In est nibh, hendrerit in neque scelerisque, dictum tincidunt justo. Etiam sed aliquam risus, eget vehicula sapien. Morbi gravida in libero ac convallis. Nam a dapibus ligula, tincidunt euismod dolor. Duis posuere porttitor est ut dignissim. Duis non molestie turpis.",
+    "categories":[1,2,4]
+}
+
+/slug/comment
+{
+    "comment":"first comment"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+users/change-password
+{
+"old_password" : "930615Fly",
+"new_password1" : "591003Black",
+"new_password2" : "591003Black"
+}
+
+users/update-email
+{
+"password" : "930615Fly",
+"new_email" : "biri@example.com"
+}
+
+users/me POST
+{
+    "gender": "w",
+    "birthday": "2000-2-7",
+    "phone_number": "+905323936604",
+    "country": "TR",
+    "city": "Samsun"
+}
+{
+    "gender": "w",
+    "birthday": "2000-3-11",
+    "phone_number": "+905061400604"
+}

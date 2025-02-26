@@ -7,7 +7,7 @@ from django.db.models import UniqueConstraint
 """
 User (Django User Model)
    ├── Profile (OneToOne)
-   ├── Post (OneToMany)
+   ├── Blog (OneToMany)
    │    ├── Comment (OneToMany)
    │    ├── Like (OneToMany)
    │    ├── Category (ManyToMany)
