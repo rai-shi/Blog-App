@@ -37,27 +37,43 @@ class CategoryView(APIView):
             status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 # get all blogs
 class BlogView(APIView):
     def get(self, request):
+
         blogs = Blog.objects.all()
+
         serializer = BlogsSerializer(blogs, many=True)
+        serializer_data = serializer.data
+
+        for i, blog in enumerate(blogs):
+            serializer_data[i]["comment_count"] = blogCommentCount(blog)
+            serializer_data[i]["like_count"] = getLikeCount(blog)
+
         return Response(
-            serializer.data, 
+            serializer_data,
             status=status.HTTP_200_OK)
                 
 # get blog detail
 class BlogDetailView(APIView):
     def get(self, request, slug):
         blog = Blog.objects.filter(slug=slug).first()
+
         if not blog:
             raise NotFound("Blog not found")
+        
         serializer = BlogDetailSerializer(blog)
+        serializer_data = serializer.data
+
+        comments, comment_count = getBlogComment(blog)
+        serializer_data["comments"] = comments
+        serializer_data["comment_count"] = comment_count
+        serializer_data["like_count"] = getLikeCount(blog)
+
         return Response(
-            serializer.data, 
+            serializer_data, 
             status=status.HTTP_200_OK)
+
 
 
 # get all blogs by user
@@ -67,8 +83,14 @@ class UserBlogsView(APIView):
     def get(self, request):
         blogs = Blog.objects.filter(author=request.user)
         serializer = BlogsSerializer(blogs, many=True)
+        serializer_data = serializer.data
+
+        for i, blog in enumerate(blogs):
+            serializer_data[i]["comment_count"] = blogCommentCount(blog)
+            serializer_data[i]["like_count"] = getLikeCount(blog)
+
         return Response(
-            serializer.data, 
+            serializer_data,
             status=status.HTTP_200_OK)
 
 # get blog detail by user
@@ -77,11 +99,20 @@ class UserBlogView(APIView):
 
     def get(self, request, slug):
         blog = Blog.objects.filter(author=request.user, slug=slug).first()
+        
         if not blog:
             raise NotFound("Blog not found")
+        
         serializer = BlogDetailSerializer(blog)
+        serializer_data = serializer.data
+
+        comments, comment_count = getBlogComment(blog)
+        serializer_data["comments"] = comments
+        serializer_data["comment_count"] = comment_count
+        serializer_data["like_count"] = getLikeCount(blog)
+
         return Response(
-            serializer.data, 
+            serializer_data, 
             status=status.HTTP_200_OK)
 
     def put(self, request, slug):
@@ -116,3 +147,65 @@ class CreateBlogView(APIView):
     
 
 
+def getBlogComment(blog):
+    serializer = CommentSerializer(blog.comments, many=True)
+    return serializer.data, len(serializer.data)
+
+def blogCommentCount(blog):
+    return blog.comments.count()
+
+class CommentView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, slug):
+        
+        comment = request.data['comment']
+        blog = Blog.objects.filter(slug=slug).first()
+        if not blog:
+            raise NotFound("Blog not found")
+        comment = Comment.objects.create(
+            post=blog,
+            user=request.user,
+            content=comment
+        )
+        serializer = CommentSerializer(comment)
+        return Response(
+            serializer.data, 
+            status=status.HTTP_201_CREATED)
+    
+    def delete(self, request, slug):
+        comment_id = request.data['id']
+        comment = Comment.objects.get(id=comment_id)
+        if not comment:
+            raise NotFound("Comment not found")
+        comment.delete()
+        return Response(
+            {"message": "Comment deleted successfully"}, 
+            status=status.HTTP_204_NO_CONTENT)
+
+
+
+def getLikeCount(blog):
+    return blog.likes.count()
+
+class LikeView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, slug):
+        blog = Blog.objects.filter(slug=slug).first()
+        if not blog:
+            raise NotFound("Blog not found")
+        
+        like = Like.objects.filter(user=request.user, post=blog).first()
+        
+        if like:
+            like.delete()
+            return Response(
+                {"message": "Like removed successfully"}, 
+                status=status.HTTP_204_NO_CONTENT)
+        
+        like = Like.objects.create(
+            user=request.user,
+            post=blog
+        )
+        return Response(
+            {"message": "Liked successfully"}, 
+            status=status.HTTP_201_CREATED)

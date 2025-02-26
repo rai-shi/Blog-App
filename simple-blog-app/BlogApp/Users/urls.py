@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import * 
-from Blogs.views import UserBlogsView, CreateBlogView, UserBlogView
+from Blogs.views import UserBlogsView, CreateBlogView, UserBlogView, CommentView
 
 urlpatterns = [
     # POST register
@@ -13,14 +13,14 @@ urlpatterns = [
     # GET, DELETE user profile
     path('me/', ProfileView.as_view(), name='profile'),
 
-    # POST create blog
-    path('my-blogs/new-story/', CreateBlogView.as_view(), name='create-blog'),
-
     # GET all
     path('my-blogs/', UserBlogsView.as_view(), name='my-blogs'),
+
+    # POST create blog
+    path('my-blogs/new-story/', CreateBlogView.as_view(), name='create-blog'),
     
     # GET blog detail
-    path('my-blogs/<slug:slug>/', UserBlogView.as_view(), name='blog-detail')
+    path('my-blogs/<slug:slug>/', UserBlogView.as_view(), name='blog-detail'),
 
     # update user profile, password
 ]   
