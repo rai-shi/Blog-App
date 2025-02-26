@@ -99,10 +99,7 @@ class LoginView(APIView):
         password = request.data['password']
 
         django_user = authenticate(request=request, username=username, password=password) 
-        print( "auth")
         login(request=request, user=django_user)
-        print("login")
-
 
         return Response(
                 {'message': 'User logged in successfully'}, 

@@ -47,10 +47,83 @@ user/my-blogs/new-story/
 
 elasticsearch
 
-user 
+user_index
     first_name
     last_name
+    full_name
     username
+    profile { inner object}
+        bio
+        categories
 
-profile 
+blog_index
+    title
+    description
+    content 
+    created_at
+    author { inner object }
+        id 
+        username 
+        full_name
+    categories
+    comment_count
+    like_count
+    comment_index {nested object}
+        content 
+        user { inner object }
+            id
+            username 
 
+category_index   
+    name 
+
+
+user profile 1-1
+    inner object 
+user blog 1-N
+    // blog altına author_id böylece application side tanımlanmış oldu
+    inner object 
+user category N-N 
+    parent child
+
+blog category N-N 
+    parent child 
+
+
+blog comment 1-N
+    nested object
+
+
+
+
+
+
+user_index
+    first_name
+    last_name
+    full_name
+    username
+    profile { inner object}
+        bio
+        categories { denormalized }
+
+blog_index
+    title
+    description
+    content 
+    created_at
+    author_id { application side approach will be used}
+    author_username { application side approach will be used}
+    comment_count
+    like_count
+    comment_index { nested object }
+        content 
+        user { inner object }
+            id
+            username 
+    categories { nested object }
+        id 
+        name 
+
+curl -X GET "http://localhost:9200/_cat/indices?v"
+curl -X GET "http://localhost:9200/user_index/_mapping?pretty"

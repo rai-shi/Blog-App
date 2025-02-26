@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # project apps
     "Users",
     "Blogs",
+    "Search",
 
     # api packages
     'rest_framework',
