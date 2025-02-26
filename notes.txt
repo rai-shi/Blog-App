@@ -4,7 +4,11 @@ user/register POST
     "first_name": "ayse",
     "last_name": "tak",
     "email": "ayse1@gmail.com",
-    "password": "930615Fly"
+    "password": "930615Fly",
+    "profile":{
+        "bio":"ai enthusiast",
+        "categories":[1,2,4,5]
+    }
 }
 
 user/login POST
@@ -41,40 +45,12 @@ user/my-blogs/new-story/
 
 
 
+elasticsearch
 
+user 
+    first_name
+    last_name
+    username
 
+profile 
 
-
-
-
-
-
-
-
-
-users/change-password
-{
-"old_password" : "930615Fly",
-"new_password1" : "591003Black",
-"new_password2" : "591003Black"
-}
-
-users/update-email
-{
-"password" : "930615Fly",
-"new_email" : "biri@example.com"
-}
-
-users/me POST
-{
-    "gender": "w",
-    "birthday": "2000-2-7",
-    "phone_number": "+905323936604",
-    "country": "TR",
-    "city": "Samsun"
-}
-{
-    "gender": "w",
-    "birthday": "2000-3-11",
-    "phone_number": "+905061400604"
-}

@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.db import models
 from django.contrib.auth.models import User
+from .models import Profile
+from Blogs.models import Category
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,4 +42,32 @@ class UserSerializer(serializers.ModelSerializer):
         if password is not None:
             instance.set_password(password)
         return super().update(instance, validated_data)
+    
+
+# user bio categories
+class ProfileSerializer(serializers.ModelSerializer):
+    categories = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        many=True,
+        write_only=True  
+    )
+    category_names = serializers.SerializerMethodField()  
+    username = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = "__all__"
+        extra_kwargs = {
+            "user": {"write_only": True},
+            "username": {"read_only": True},
+            "category_names": {"read_only": True},
+        }
+
+    def get_category_names(self, obj):
+        return [{"name":category.name, "id":category.id} for category in obj.categories.all()]
+    def get_username(self, obj):
+        return {"name":obj.user.username, "id":obj.user.id}
+
+
+    
     

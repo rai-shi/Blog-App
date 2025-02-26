@@ -23,7 +23,7 @@ import datetime, environ, os
 
 # models, serializers and other dependencies
 from django.contrib.auth.models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, ProfileSerializer
 
 env = environ.Env()
 environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
@@ -58,6 +58,7 @@ def getUserByID(payload:dict) -> User|NotFound :
 class RegisterView(APIView):
     def post(self, request):
         data = request.data
+        profile_data = data.pop('profile')
 
         # check if the user data is valid
         if User.objects.filter(username=data['username']).exists():
@@ -69,10 +70,21 @@ class RegisterView(APIView):
             return Response(
                     {'error': 'Email already exists'}, 
                     status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            serializer = UserSerializer(data = data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()     
 
-        serializer = UserSerializer(data = data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()     
+            profile_data['user'] = user.id
+            profile_serializer = ProfileSerializer(data = profile_data)
+            profile_serializer.is_valid(raise_exception=True)
+            profile_serializer.save()
+            
+        except DjangoValidationError as e:
+            return Response(
+                    {'error': str(e)}, 
+                    status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
             {           'message': 'User created successfully'}, 
@@ -111,9 +123,11 @@ class ProfileView(APIView):
 
     def get(self, request):
         user = request.user
-        serializer = UserSerializer(user)
+        user_serializer = UserSerializer(user)
+        profile_serializer = ProfileSerializer(user.profile)
+        result = user_serializer.data | profile_serializer.data
         return Response(
-                        serializer.data,
+                        result,
                         status=status.HTTP_200_OK)
     
     def delete(self, request):
