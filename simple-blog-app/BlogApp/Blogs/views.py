@@ -171,17 +171,16 @@ class CommentView(APIView):
         return Response(
             serializer.data, 
             status=status.HTTP_201_CREATED)
-    
-    def delete(self, request, slug):
-        comment_id = request.data['id']
-        comment = Comment.objects.get(id=comment_id)
+
+class CommentDeleteView(APIView):
+    def delete(self, request, slug, id): # ? slug
+        comment = Comment.objects.get(id=id)
         if not comment:
             raise NotFound("Comment not found")
         comment.delete()
         return Response(
             {"message": "Comment deleted successfully"}, 
             status=status.HTTP_204_NO_CONTENT)
-
 
 
 def getLikeCount(blog):

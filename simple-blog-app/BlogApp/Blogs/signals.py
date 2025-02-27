@@ -42,10 +42,11 @@ def elasticsearch_blog(instance):
         
         like_count=like_count,
         comment_count=comment_count,
-        # comments=[{"content": comment.content, "user": {"id": comment.user.id, "username": comment.user.username}} for comment in comments]
+        comments=[]
         )
 
     blog_doc.save()
+
 
 
 # blog deletion signals
@@ -56,6 +57,8 @@ def delete_blog_index(sender, instance, **kwargs):
     except:
         raise Exception("Blog not found in index")
 
+
+
 # blog like signals
 @receiver([post_save, post_delete], sender=Like)
 def update_like_count(sender, instance, **kwargs):
@@ -65,9 +68,27 @@ def update_like_count(sender, instance, **kwargs):
     try:
         blog_doc = BlogIndex.get(id=blog.id)
         blog_doc.update(like_count=like_count)
-        print(f"Updated like_count for {blog.title} ({like_count} likes)")
     except BlogIndex.DoesNotExist:
         print(f"Blog {blog.title} not found in Elasticsearch!")
 
 # blog comment signals
+@receiver([post_save, post_delete], sender=Comment)
+def update_comment(sender, instance, **kwargs):
+    blog = instance.post
+    comment_count = blog.comments.count()
+    comments = list(blog.comments.all())
+    print(f"Comments: {comments}")
+
+    try:
+        blog_doc = BlogIndex.get(id=blog.id)
+        blog_doc.update(comment_count=comment_count, 
+                        comments=[
+                            {"content": comment.content, 
+                             "user":
+                                {"id": comment.user.id, 
+                                 "username": comment.user.username}} for comment in comments])
+    except BlogIndex.DoesNotExist:
+        print(f"Blog {blog.title} not found in Elasticsearch!")
+
+
 # blog update signals
