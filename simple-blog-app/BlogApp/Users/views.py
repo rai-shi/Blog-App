@@ -74,6 +74,7 @@ class RegisterView(APIView):
             serializer = UserSerializer(data = data)
             serializer.is_valid(raise_exception=True)
             user = serializer.save()  
+
             profile_data['user'] = user.id
             profile_serializer = ProfileSerializer(data = profile_data)
             profile_serializer.is_valid(raise_exception=True)
@@ -97,6 +98,8 @@ class LoginView(APIView):
         password = request.data['password']
 
         django_user = authenticate(request=request, username=username, password=password) 
+        if django_user is None:
+            raise AuthenticationFailed("Invalid credentials, try again or please register")
         login(request=request, user=django_user)
 
         return Response(

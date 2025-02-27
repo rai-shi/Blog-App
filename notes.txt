@@ -130,3 +130,8 @@ curl -X GET "http://localhost:9200/user_index/_mapping?pretty"
 curl -X DELETE http://localhost:9200/blog_index
 curl -X GET "http://localhost:9200/user_index/_search?pretty"
 
+curl -X POST "http://localhost:9200/user_index/_delete_by_query" -H "Content-Type: application/json" -d '{
+  "query": {
+    "match_all": {}
+  }
+}'
