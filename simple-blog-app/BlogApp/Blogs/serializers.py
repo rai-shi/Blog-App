@@ -13,7 +13,6 @@ class BlogDetailSerializer(serializers.ModelSerializer):
     category_names = serializers.SerializerMethodField()  
     author_name = serializers.SerializerMethodField()
 
-
     class Meta:
         model = Blog
         fields = "__all__"
@@ -29,6 +28,15 @@ class BlogDetailSerializer(serializers.ModelSerializer):
     def get_author_name(self, obj):
         return {"name":obj.author.username, "id":obj.author.id}
 
+class BlogUpdateSerializer(serializers.ModelSerializer):
+    categories = serializers.PrimaryKeyRelatedField(
+            queryset=Category.objects.all(),
+            many=True,
+            write_only=True  
+        )
+    class Meta:
+        model = Blog
+        fields = ["title", "description", "content", "categories"]
 
 # for getting all blogs
 class BlogsSerializer(serializers.ModelSerializer):

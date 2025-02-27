@@ -27,8 +27,16 @@ def elasticsearch_blog(instance):
     categories = list(instance.categories.all())
     like_count = instance.likes.count()
     comment_count = instance.comments.count()
-    # comments = list(instance.comments.all())
-    # print(f"Comments: {comments}")
+    
+    structed_comments = []
+    if comment_count > 0:
+        comments = list(instance.comments.all())
+        structed_comments=[
+                            {"id": comment.id,
+                            "content": comment.content, 
+                            "user":
+                                {"id": comment.user.id, 
+                                 "username": comment.user.username}} for comment in comments]
     blog_doc = BlogIndex(
         meta={"id": instance.id},
         title=instance.title,
@@ -37,12 +45,12 @@ def elasticsearch_blog(instance):
         created_at=instance.created_at,
         author_username=instance.author.username,
         author_id=instance.author.id,
-
-        categories=[{"id": cat.id, "name": cat.name} for cat in categories],
-        
         like_count=like_count,
         comment_count=comment_count,
-        comments=[]
+        comments=structed_comments,
+        categories=[{"id": cat.id, 
+                     "name": cat.name} for cat in categories],
+        
         )
 
     blog_doc.save()

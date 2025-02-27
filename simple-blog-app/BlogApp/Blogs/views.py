@@ -115,8 +115,23 @@ class UserBlogView(APIView):
             serializer_data, 
             status=status.HTTP_200_OK)
 
-    # def put(self, request, slug):
-    #     pass
+    def put(self, request, slug):
+        blog = Blog.objects.filter(author=request.user, slug=slug).first()
+        
+        if not blog:
+            raise NotFound("Blog not found")
+        
+        data = request.data
+        serializer = BlogUpdateSerializer(blog, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data, 
+                status=status.HTTP_200_OK)
+        
+        return Response(
+            serializer.errors, 
+            status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, slug):
         blog = Blog.objects.filter(author=request.user, slug=slug).first()
@@ -194,6 +209,7 @@ class CommentDeleteView(APIView):
         return Response(
             serializer.data, 
             status=status.HTTP_200_OK)
+
     
     def delete(self, request, slug, id): 
         comment = Comment.objects.get(id=id)

@@ -24,7 +24,7 @@ category/
     "name" : "tech"
 }
 
-user/my-blogs/new-story/
+user/my-blogs/new-story/ POST
 {
     "title":"Elasticsearh Nedir?",
     "description": "Lorem ipsum dolor sit amet",
@@ -37,6 +37,13 @@ user/my-blogs/new-story/
     "content":"Quisque eu est sit amet lorem auctor dignissim. In est nibh, hendrerit in neque scelerisque, dictum tincidunt justo. Etiam sed aliquam risus, eget vehicula sapien. Morbi gravida in libero ac convallis. Nam a dapibus ligula, tincidunt euismod dolor. Duis posuere porttitor est ut dignissim. Duis non molestie turpis.",
     "categories":[1,2,4]
 }
+
+user/my-blogs/slug PUT 
+{
+"categories":[3],
+"description":"Elasticsearch nedir hakkında güzel bir makale."
+}
+
 
 /slug/comment
 {
