@@ -156,6 +156,17 @@ def blogCommentCount(blog):
 
 class CommentView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request, slug):
+        blog = Blog.objects.filter(slug=slug).first()
+        if not blog:
+            raise NotFound("Blog not found")
+        comments = Comment.objects.filter(post=blog)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(
+            serializer.data, 
+            status=status.HTTP_200_OK)
+
     def post(self, request, slug):
         
         comment = request.data['comment']
@@ -173,7 +184,18 @@ class CommentView(APIView):
             status=status.HTTP_201_CREATED)
 
 class CommentDeleteView(APIView):
-    def delete(self, request, slug, id): # ? slug
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, slug, id):
+        comments = Comment.objects.get(id=id)
+        if not comments:
+            raise NotFound("Comment not found")
+        serializer = CommentSerializer(comments)
+        return Response(
+            serializer.data, 
+            status=status.HTTP_200_OK)
+    
+    def delete(self, request, slug, id): 
         comment = Comment.objects.get(id=id)
         if not comment:
             raise NotFound("Comment not found")

@@ -72,7 +72,7 @@ def update_like_count(sender, instance, **kwargs):
         print(f"Blog {blog.title} not found in Elasticsearch!")
 
 
-# blog comment signals
+# blog comment signals, (create, update)
 @receiver(post_save, sender=Comment)
 def update_comment(sender, instance, **kwargs):
     blog = instance.post
@@ -107,10 +107,3 @@ def remove_comment_from_index(sender, instance, **kwargs):
         )
     except BlogIndex.DoesNotExist:
         print(f"Blog {blog.title} not found in Elasticsearch!")
-
-
-# blog update signals
-
-
-
-
