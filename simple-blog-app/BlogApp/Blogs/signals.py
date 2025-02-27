@@ -71,24 +71,46 @@ def update_like_count(sender, instance, **kwargs):
     except BlogIndex.DoesNotExist:
         print(f"Blog {blog.title} not found in Elasticsearch!")
 
+
 # blog comment signals
-@receiver([post_save, post_delete], sender=Comment)
+@receiver(post_save, sender=Comment)
 def update_comment(sender, instance, **kwargs):
     blog = instance.post
     comment_count = blog.comments.count()
     comments = list(blog.comments.all())
-    print(f"Comments: {comments}")
 
     try:
         blog_doc = BlogIndex.get(id=blog.id)
         blog_doc.update(comment_count=comment_count, 
                         comments=[
-                            {"content": comment.content, 
-                             "user":
+                            {"id": comment.id,
+                            "content": comment.content, 
+                            "user":
                                 {"id": comment.user.id, 
                                  "username": comment.user.username}} for comment in comments])
     except BlogIndex.DoesNotExist:
         print(f"Blog {blog.title} not found in Elasticsearch!")
 
+@receiver(post_delete, sender=Comment)
+def remove_comment_from_index(sender, instance, **kwargs):
+    blog = instance.post
+    try:
+        blog_doc = BlogIndex.get(id=blog.id)
+        
+        updated_comments = [
+            comment for comment in blog_doc.comments 
+            if not comment.id == instance.id
+        ]
+        blog_doc.update(
+            comment_count=blog.comments.count(), 
+            comments=updated_comments
+        )
+    except BlogIndex.DoesNotExist:
+        print(f"Blog {blog.title} not found in Elasticsearch!")
+
 
 # blog update signals
+
+
+
+

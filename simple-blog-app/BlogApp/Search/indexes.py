@@ -24,6 +24,7 @@ class UserIndex(Document):
 
 
 class CommentInner(InnerDoc):
+    id = Integer(required=True)
     content = Text()
     user = Nested(properties={
         "id": Integer(required=True),
