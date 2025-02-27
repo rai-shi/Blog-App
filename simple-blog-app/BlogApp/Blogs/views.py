@@ -115,8 +115,8 @@ class UserBlogView(APIView):
             serializer_data, 
             status=status.HTTP_200_OK)
 
-    def put(self, request, slug):
-        pass
+    # def put(self, request, slug):
+    #     pass
 
     def delete(self, request, slug):
         blog = Blog.objects.filter(author=request.user, slug=slug).first()
@@ -194,18 +194,25 @@ class LikeView(APIView):
         if not blog:
             raise NotFound("Blog not found")
         
+        like, created = Like.objects.get_or_create(user=request.user, post=blog)
+        
+        if not created:
+            return Response({"message": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "Liked successfully"}, status=status.HTTP_201_CREATED)
+    
+    
+    def delete(self, request, slug):
+        blog = Blog.objects.filter(slug=slug).first()
+        if not blog:
+            raise NotFound("Blog not found")
+        
         like = Like.objects.filter(user=request.user, post=blog).first()
         
-        if like:
-            like.delete()
-            return Response(
-                {"message": "Like removed successfully"}, 
-                status=status.HTTP_204_NO_CONTENT)
+        if not like:
+            raise NotFound("Like not found")
         
-        like = Like.objects.create(
-            user=request.user,
-            post=blog
-        )
+        like.delete()
         return Response(
-            {"message": "Liked successfully"}, 
-            status=status.HTTP_201_CREATED)
+            {"message": "Like removed successfully"}, 
+            status=status.HTTP_204_NO_CONTENT)
