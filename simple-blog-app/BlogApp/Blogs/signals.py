@@ -46,10 +46,14 @@ def elasticsearch_blog(instance):
     blog_doc.save()
 
 
-
-
-
 # blog deletion signals
+@receiver(post_delete, sender=Blog)
+def delete_blog_index(sender, instance, **kwargs):
+    try:
+        BlogIndex.get(id=instance.id).delete()
+    except:
+        raise Exception("Blog not found in index")
+
 # blog update signals
 # blog comment signals
 # blog like signals
