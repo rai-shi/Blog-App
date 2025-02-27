@@ -127,3 +127,6 @@ blog_index
 
 curl -X GET "http://localhost:9200/_cat/indices?v"
 curl -X GET "http://localhost:9200/user_index/_mapping?pretty"
+curl -X DELETE http://localhost:9200/blog_index
+curl -X GET "http://localhost:9200/user_index/_search?pretty"
+

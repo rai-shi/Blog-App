@@ -24,7 +24,7 @@ import datetime, environ, os
 # models, serializers and other dependencies
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, ProfileSerializer
-
+from .models import Profile
 env = environ.Env()
 environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
 
@@ -70,12 +70,10 @@ class RegisterView(APIView):
             return Response(
                     {'error': 'Email already exists'}, 
                     status=status.HTTP_400_BAD_REQUEST)
-        
         try:
             serializer = UserSerializer(data = data)
             serializer.is_valid(raise_exception=True)
-            user = serializer.save()     
-
+            user = serializer.save()  
             profile_data['user'] = user.id
             profile_serializer = ProfileSerializer(data = profile_data)
             profile_serializer.is_valid(raise_exception=True)

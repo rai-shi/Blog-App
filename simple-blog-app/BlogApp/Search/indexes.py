@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Document, Text, Keyword, Date, Nested, InnerDoc
+from elasticsearch_dsl import Document, Text, Integer, Keyword, Date, Nested, InnerDoc
 import elasticsearch_dsl as es
 
 class ProfileInner(InnerDoc):
@@ -6,10 +6,10 @@ class ProfileInner(InnerDoc):
     categories = Keyword(multi=True) # denormalized categories [names]
 
 class UserIndex(Document):
-    first_name = Text()
-    last_name = Text()
-    full_name = Text()
-    username = Keyword()
+    first_name = Text(required=True)
+    last_name = Text(required=True)
+    full_name = Text(required=True)
+    username = Keyword(required=True)
     profile = ProfileInner()
 
     class Index:
@@ -21,27 +21,33 @@ class UserIndex(Document):
     class Meta:
         doc_type = 'user'
 
+
+
 class CommentInner(InnerDoc):
     content = Text()
     user = Nested(properties={
-        "id": Keyword(),
-        "username": Keyword()
+        "id": Integer(required=True),
+        "username": Keyword(required=True)
     })
 
 class BlogIndex(Document):
-    title = Text()
+    title = Text(required=True)
     description = Text()
-    content = Text()
+    content = Text(required=True)
     created_at = Date()
-    author_id = Keyword()  # author id
-    author_username = Keyword()  # author
+    author_id = Integer(required=True)  # author id
+    author_username = Keyword(required=True)  # author
     categories = Nested(properties={
-        "id": Keyword(),
-        "name": Text()
+        "id": Integer(required=True),
+        "name": Keyword(required=True)
     })
-    comment_count = Keyword()
-    like_count = Keyword()
+    comment_count = Integer()
+    like_count = Integer()
     comments = Nested(CommentInner)
 
     class Index:
         name = "blog_index"
+        settings = {
+            "number_of_shards": 1,
+            "number_of_replicas": 1
+        }

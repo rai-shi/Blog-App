@@ -113,8 +113,8 @@ DATABASES = {
 # Elasticsearch settings
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': ['localhost:9200'],
-    },
+        'hosts': 'http://localhost:9200' 
+    }
 }
 
 

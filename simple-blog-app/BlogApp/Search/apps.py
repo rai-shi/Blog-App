@@ -10,3 +10,5 @@ class SearchConfig(AppConfig):
         connections.create_connection(hosts=["http://localhost:9200"])
         UserIndex.init()
         BlogIndex.init()
+        print("Elasticsearch connected and indexes created")
+        
