@@ -18,10 +18,8 @@ User can
 * like and unlike blogs, comment blogs
 ---
 
-
+**Django Models**
 ```
-Django Models
-
 User 
    ├── Profile (OneToOne)
    ├── Post (OneToMany)
@@ -33,4 +31,44 @@ Post
    ├── Like (OneToMany)
    ├── Category (ManyToMany)
 
+```
+
+**Elasticsearch Indices**
+```
+user_index
+   first_name
+   last_name
+   full_name
+   username
+   profile (Inner Object)
+      bio
+      categories (Denormalized)
+         id 
+         name
+
+user-profile 1-1 -> inner object
+profile-category N-N -> denormalized
+```
+```
+blog_index 
+   title
+   description
+   content
+   created_at
+   author_id
+   author_username
+   comment_count
+   like_count
+   comments (Nested)
+      id
+      user (Nested)
+         id
+         username
+   categories (Nested)
+      id
+      name
+   
+blog-comment 1-N -> nested
+user-comment 1-N -> nested 
+blog-category N-N -> nested
 ```
