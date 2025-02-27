@@ -8,7 +8,7 @@ PostgreSQL-Elasticsearch-Django-Bootstrap
 * run migrations
 * start django server in manage.py path ```python manage.py runserver```
 
-you can find some example data for testing API's in here.
+you can find some example data for testing API's in [here](https://github.com/rai-shi/Blog-App/blob/main/notes.txt).
 
 ---
 User can 
