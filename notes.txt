@@ -135,3 +135,10 @@ curl -X POST "http://localhost:9200/user_index/_delete_by_query" -H "Content-Typ
     "match_all": {}
   }
 }'
+
+
+curl -X POST "http://localhost:9200/blog_index/_delete_by_query" -H "Content-Type: application/json" -d '{
+  "query": {
+    "match_all": {}
+  }
+}'
