@@ -12,3 +12,12 @@ class SearchConfig(AppConfig):
         BlogIndex.init()
         print("Elasticsearch connected and indexes created")
         
+
+
+# from elasticsearch.helpers import bulk
+# from elasticsearch import Elasticsearch
+
+# def bulk_indexing():
+#     Index.init()
+#     es = Elasticsearch()
+#     bulk(client=es, actions=(b.indexing() for b in models.ModelName.objects.all().iterator()))

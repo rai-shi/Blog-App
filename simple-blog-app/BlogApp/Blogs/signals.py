@@ -23,6 +23,8 @@ def update_blog_index_on_category_change(sender, instance, action, **kwargs):
         print(f"Categories updated for {instance.title}")
         elasticsearch_blog(instance)
 
+
+# instance.indexing()
 def elasticsearch_blog(instance):
     categories = list(instance.categories.all())
     like_count = instance.likes.count()

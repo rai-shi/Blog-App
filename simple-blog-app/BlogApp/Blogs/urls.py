@@ -9,5 +9,4 @@ urlpatterns = [
     path('<slug:slug>/comment', CommentView.as_view(), name='comment'),
     path('<slug:slug>/comment/<int:id>', CommentDeleteView.as_view(), name='comment'),
     path('<slug:slug>/like', LikeView.as_view(), name='like'),
-
 ]   

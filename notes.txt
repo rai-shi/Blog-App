@@ -18,19 +18,20 @@ user/login POST
 }
 
 user/logout GET
+user/me GET
+user/me DELETE
 
-category/
-{
-    "name" : "tech"
-}
+user/my-blogs GET (get user's all blogs)
 
 user/my-blogs/new-story/ POST
+data-1
 {
     "title":"Elasticsearh Nedir?",
     "description": "Lorem ipsum dolor sit amet",
     "content":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eu maximus urna, eu dapibus tortor. In hac habitasse platea dictumst. Fusce sagittis vestibulum tristique. Nunc hendrerit dolor est, sed euismod velit blandit vitae. Duis accumsan eget tortor sit amet aliquet. Integer et magna enim. Aenean egestas orci vel turpis suscipit egestas. Morbi vestibulum tempor viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis at enim ac metus sodales auctor ut sit amet risus. Nunc imperdiet nec felis ullamcorper laoreet. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nulla rhoncus augue a massa maximus, quis facilisis lectus dignissim. Praesent molestie lacus eget tortor semper, id eleifend urna hendrerit. Nam vel blandit mi, at feugiat ex.",
     "categories":[1,2]
 }
+data-2
 {
     "title":"Lorem Ipsum Nedir?",
     "description": "Quisque eu est sit amet lorem auctor dignissim!",
@@ -39,16 +40,66 @@ user/my-blogs/new-story/ POST
 }
 
 user/my-blogs/slug PUT 
+categories, description, title, content can update
 {
 "categories":[3],
 "description":"Elasticsearch nedir hakkında güzel bir makale."
 }
 
+user/my-blogs/slug GET
+user/my-blogs/slug DELETE
 
-/slug/comment
+
+
+/blogs GET (get all blogs)
+/blogs/slug GET 
+/blogs/slug/comment GET POST    
 {
     "comment":"first comment"
 }
+/blogs/slug/comment/id GET DELETE 
+
+/blogs/slug/like POST DELETE
+ 
+
+/search/users/?q=raishi GET
+/search/blogs/?keyword=raishi GET
+
+
+blogs/category/ GET, POST
+{
+    "name" : "tech"
+}
+
+
+
+list indices
+curl -X GET "http://localhost:9200/_cat/indices?v"
+
+view user_index mapping
+curl -X GET "http://localhost:9200/user_index/_mapping?pretty"
+
+delete blog index
+curl -X DELETE http://localhost:9200/blog_index
+
+view user index all data
+curl -X GET "http://localhost:9200/user_index/_search?pretty"
+
+delete user index datas
+curl -X POST "http://localhost:9200/user_index/_delete_by_query" -H "Content-Type: application/json" -d '{
+  "query": {
+    "match_all": {}
+  }
+}'
+
+delete blog index datas
+curl -X POST "http://localhost:9200/blog_index/_delete_by_query" -H "Content-Type: application/json" -d '{
+  "query": {
+    "match_all": {}
+  }
+}'
+
+
 
 
 
@@ -132,20 +183,3 @@ blog_index
         id 
         name 
 
-curl -X GET "http://localhost:9200/_cat/indices?v"
-curl -X GET "http://localhost:9200/user_index/_mapping?pretty"
-curl -X DELETE http://localhost:9200/blog_index
-curl -X GET "http://localhost:9200/user_index/_search?pretty"
-
-curl -X POST "http://localhost:9200/user_index/_delete_by_query" -H "Content-Type: application/json" -d '{
-  "query": {
-    "match_all": {}
-  }
-}'
-
-
-curl -X POST "http://localhost:9200/blog_index/_delete_by_query" -H "Content-Type: application/json" -d '{
-  "query": {
-    "match_all": {}
-  }
-}'
