@@ -51,7 +51,10 @@ class BlogView(APIView):
             serializer_data[i]["like_count"] = getLikeCount(blog)
 
         return Response(
-            serializer_data,
+            {
+                "count": len(serializer_data),
+                "data":serializer_data
+            },
             status=status.HTTP_200_OK)
                 
 # get blog detail
@@ -90,7 +93,10 @@ class UserBlogsView(APIView):
             serializer_data[i]["like_count"] = getLikeCount(blog)
 
         return Response(
-            serializer_data,
+            {
+                "count": len(serializer_data),
+                "data":serializer_data
+            },
             status=status.HTTP_200_OK)
 
 # get blog detail by user

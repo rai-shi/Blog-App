@@ -29,12 +29,12 @@ class Category(models.Model):
     
 
 class Blog(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.TextField()
     description = models.TextField()
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=500)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="blogs")
     categories = models.ManyToManyField(Category, related_name="blogs")
@@ -69,3 +69,13 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user.username} liked {self.post.title}"
+    
+
+
+# from django.apps import apps
+
+# for model in apps.get_models():
+#     print(f"{model.__name__}: {model.objects.count()} kayıt var.")
+
+
+

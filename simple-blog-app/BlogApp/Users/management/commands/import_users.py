@@ -5,10 +5,11 @@ from Users.serializers import UserSerializer, ProfileSerializer
 import os
 from django.conf import settings  
 from pathlib import Path  
+import time
 
 
 class Command(BaseCommand):
-    help = 'Import specialities from a .txt file into the database'
+    help = 'Import specialities from a .csv file into the database'
 
     def handle(self, *args, **kwargs):
         file_path = Path(settings.BASE_DIR) / 'Users' / 'management' / 'commands' / 'authors.csv'
@@ -18,25 +19,29 @@ class Command(BaseCommand):
             return
 
         with open(file_path, 'r', encoding='utf-8') as file:
+            start_time = time.time()
             for line in file:
                 stripted_line = line.strip()
-                datas = stripted_line.split(",")
+                datas = stripted_line.split('"')
 
-                data = datas[7].replace("[", "")
+                user_data = datas[0].split(",")
+                category_data = datas[1]
+
+                data = category_data.replace("[", "")
                 data = data.replace("]", "")
                 data = data.replace('"', "")
                 data = data.split(",")
                 categories = [(int(i)+1) for i in data]
 
                 user_dict = {
-                    "username": datas[1],
-                    "first_name": datas[2],
-                    "last_name": datas[3],
-                    "email": datas[4],
-                    "password": datas[5]
+                    "username": user_data[1],
+                    "first_name": user_data[2],
+                    "last_name": user_data[3],
+                    "email": user_data[4],
+                    "password": user_data[5]
                 }
                 bio_dict = {
-                    "bio": datas[6],
+                    "bio": user_data[6],
                     "categories": categories
                 }
                 
@@ -59,5 +64,8 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(self.style.NOTICE(f'User already exists: {datas[2]}'))
 
+        finish_time = time.time() - start_time
+        self.stdout.write(self.style.SUCCESS('Import completed in %.4f seconds' % finish_time))
 
-        self.stdout.write(self.style.SUCCESS('Import completed'))
+
+# 39 seconds to import users

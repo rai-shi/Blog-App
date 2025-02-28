@@ -13,7 +13,7 @@ user/register POST
 
 user/login POST
 {
-    "username": "raishi",
+    "username": "justin_lee",
     "password": "930615Fly"
 }
 
@@ -83,7 +83,24 @@ delete blog index
 curl -X DELETE http://localhost:9200/blog_index
 
 view user index all data
-curl -X GET "http://localhost:9200/user_index/_search?pretty"
+curl -X GET "http://localhost:9200/user_index/_search?pretty" -H "Content-Type: application/json" -d '{
+    "query": {
+        "multi_match": {
+            "query" : "justin_lee",
+            "fields" : ["username"]
+        }
+    }
+}'
+curl -X GET "http://localhost:9200/user_index/_search?pretty" -H "Content-Type: application/json" -d '{
+    "query": {
+        "multi_match": {
+            "query" : "nikhil",         
+            "fields" : ["username"]
+        }
+    }
+}'
+
+
 
 delete user index datas
 curl -X POST "http://localhost:9200/user_index/_delete_by_query" -H "Content-Type: application/json" -d '{

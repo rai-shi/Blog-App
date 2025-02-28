@@ -62,10 +62,11 @@ class SearchBlogView(APIView):
             "multi_match", 
             query=query, 
             fields=["title", "description", "content"]
-        ).sort(
-            {"like_count": {"order": "desc"}},
-            {"comment_count": {"order": "desc"}}
         )
+        # .sort(
+        #     {"like_count": {"order": "desc"}},
+        #     {"comment_count": {"order": "desc"}}
+        # )
         results = search.execute()
 
         return Response(
