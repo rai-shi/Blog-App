@@ -14,6 +14,7 @@ from drf_yasg.utils import swagger_auto_schema
 # other requirements
 from .indexes import *
 from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Q
 
 # es = Elasticsearch(['http://localhost:9200'])
 
@@ -89,6 +90,30 @@ class SearchBlogView(APIView):
 """
     
 
+class SearchCategoryView(APIView):
+    def get(self, request):
+        q = request.GET.get("tag")
+        if not q:
+            return Response(
+                {"error": "Query parameter 'tag' is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        search = BlogIndex.search().query(
+            "nested", 
+            path="categories", 
+            query=Q("match", categories__name=q)
+            # **{'address.city': 'prague'}
+        ).sort(
+            {"like_count": {"order": "desc"}},
+            {"comment_count": {"order": "desc"}}
+        )
+        results = search.execute()
+
+        return Response(
+            # {"results": [hit.to_dict() for hit in results]},
+            {"results": results.to_dict()},
+            status=status.HTTP_200_OK
+        )
     
 
 
