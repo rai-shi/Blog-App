@@ -4,7 +4,8 @@ from .views import *
 urlpatterns = [
 
     path('users/', SearchUserView.as_view(), name='search-users'),
-    # path('blogs/', SearchBlogView.as_view(), name='search-blogs'),
+    path('blogs/', 
+         SearchBlogView.as_view(), name='search-blogs'),
 
 
 

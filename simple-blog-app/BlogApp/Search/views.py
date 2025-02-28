@@ -15,7 +15,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .indexes import *
 from elasticsearch import Elasticsearch
 
-es = Elasticsearch(['http://localhost:9200'])
+# es = Elasticsearch(['http://localhost:9200'])
 
 
 class SearchUserView(APIView):
@@ -28,32 +28,67 @@ class SearchUserView(APIView):
             )
         search = UserIndex.search()
         search = search.query("multi_match", query=query, fields=["full_name", "username", "profile.bio"])
+        # bir tane field aramak için match 
         response = search.execute()
         return Response(
             response.to_dict(),
             status=status.HTTP_200_OK
         )
     
+    """
+    curl -X POST "http://localhost:9200/user_index/_search?pretty" -H "Content-Type: application/json" -d '{
+        "query": {
+            "match": {
+            "query": "q",
+            "fields": ["full_name", "username", "profile.bio"]
+            }
+        }
+    }'
+    """
+    
 
 
-# class SearchBlogView(APIView):
-#     def get(self, request):
-#         query = request.GET.get("keyword")
-#         if not query:
-#             return Response(
-#                 {"error": "Query parameter 'keyword' is required"},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
+class SearchBlogView(APIView):
+    def get(self, request):
+        query = request.GET.get("keyword")
+        if not query:
+            return Response(
+                {"error": "Query parameter 'keyword' is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-#         search = BlogIndex.search().query(
-#             "multi_match", query=query, fields=["title", "description", "content"]
-#         )
-#         results = search.execute()
+        search = BlogIndex.search().query(
+            "multi_match", 
+            query=query, 
+            fields=["title", "description", "content"]
+        ).sort(
+            {"like_count": {"order": "desc"}},
+            {"comment_count": {"order": "desc"}}
+        )
+        results = search.execute()
 
-#         return Response(
-#             {"results": [hit.to_dict() for hit in results]},
-#             status=status.HTTP_200_OK
-#         )
+        return Response(
+            # {"results": [hit.to_dict() for hit in results]},
+            {"results": results.to_dict()},
+            status=status.HTTP_200_OK
+        )
+    
+"""
+{
+"query": {
+            "multi_match": {
+            "query": "keyword",
+            "fields": ["title", "description", "content"]
+            }
+        },
+"sort": [
+    { "like_count": { "order": "desc" } },
+    { "comment_count": { "order": "desc" } }
+  ]
+}
+"""
+    
+
     
 
 
@@ -91,6 +126,7 @@ leaf queries
 
     
 compound
+    sort?
     - constant_score
     - bool
         - must
