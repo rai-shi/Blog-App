@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.db.models import UniqueConstraint
+from django.utils.crypto import get_random_string
 
 
 """
@@ -40,12 +41,11 @@ class Blog(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title) + "-" + get_random_string(length=4)
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
-    
 
 class Comment(models.Model):
     post = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='comments')
