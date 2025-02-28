@@ -70,4 +70,3 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
     
-    
