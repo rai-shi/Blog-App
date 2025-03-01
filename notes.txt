@@ -66,6 +66,7 @@ http://127.0.0.1:8000/search/users/?user=anonymous fullname username
 http://127.0.0.1:8000/search/users/?username=dominik_felix username spesific match 
 http://127.0.0.1:8000/search/users/?category=nlp
 http://127.0.0.1:8000/search/users/?user-blogs=justin_lee
+http://127.0.0.1:8000/search/users/?user-blogs=adam_geitgey&category=Computer%20Vision
 
 http://127.0.0.1:8000/search/blogs/
 http://127.0.0.1:8000/search/blogs/?keyword=artificial title, description, content

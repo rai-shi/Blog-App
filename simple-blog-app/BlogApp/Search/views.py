@@ -14,23 +14,46 @@ from drf_yasg.utils import swagger_auto_schema
 # other requirements
 from .indexes import *
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Q
+from elasticsearch_dsl import Q, Search
 
-# es = Elasticsearch(['http://localhost:9200'])
+es = Elasticsearch(['http://localhost:9200'])
 
 
 class SearchUserView(APIView):
     def get(self, request):
 
         if not bool(request.query_params):
-            return Response(
-                {"error": "Query parameter is required"},
-                status=status.HTTP_400_BAD_REQUEST
+            # get all users by sorting their blogs count 
+            search = Search(using=es, index="blog_index") 
+            
+            search.aggs.bucket("users_by_blog_count", # aggr name
+                                "terms", # term aggregation
+                                field="author_username", 
+                                size=10,  
+                                order={"_count": "desc"}  
+                            )
+            response = search.execute()
+
+            results = [
+                {"username": bucket.key, "blog_count": bucket.doc_count}
+                for bucket in response.aggregations.users_by_blog_count.buckets
+            ]
+            return Response({
+                    "results":results,
+                    "response": response.to_dict()
+                    },
+                    status=status.HTTP_200_OK
             )
+
+            # return Response(
+            #     {"error": "Query parameter is required"},
+            #     status=status.HTTP_400_BAD_REQUEST
+            # )
         
         search = UserIndex.search()
+        # multi match search
+        # search with full_name and username
         if request.query_params.get('user'):
-            # multi_match search
             query = request.query_params.get('user')
             search_query = search.query("multi_match", 
                                         query=query, 
@@ -40,8 +63,9 @@ class SearchUserView(APIView):
                 response.to_dict(),
                 status=status.HTTP_200_OK
             )
+        
+        # term search with username
         elif request.query_params.get('username'):
-            # term search
             query = request.query_params.get('username')
             search_query = search.query("term", 
                                         username=query)
@@ -50,8 +74,26 @@ class SearchUserView(APIView):
                 response.to_dict(),
                 status=status.HTTP_200_OK
             )
+        
+        # search user blogs by category
+        elif request.query_params.get('user-blogs') and request.query_params.get('category'):
+            print("user-blogs and category")
+            username = request.query_params.get('user-blogs')
+            category = request.query_params.get('category')
+            search = BlogIndex.search().query("bool", 
+                                              must=[Q("term", author_username=username),
+                                                    Q("nested", 
+                                                        path="categories", 
+                                                        query=Q("term", categories__name=category))])
+            response = search.execute()
+            return Response(
+                response.to_dict(),
+                status=status.HTTP_200_OK
+            )
+        
+        # returns users matched with specific category
         elif request.query_params.get('category'):
-            # inner object search  
+            print("category")
             query = request.query_params.get('category')
             search_query = search.query("match", 
                                         profile__categories__name=query)
@@ -61,8 +103,9 @@ class SearchUserView(APIView):
                 status=status.HTTP_200_OK
             )
 
+        # returns user all blogs
         elif request.query_params.get('user-blogs'):
-            # get all blogs of a user
+            print("user-blogs")
             query = request.query_params.get('user-blogs')
             search = BlogIndex.search().query("term", 
                                               author_username=query)
@@ -71,33 +114,18 @@ class SearchUserView(APIView):
                 response.to_dict(),
                 status=status.HTTP_200_OK
             )
+    
         else:
             return Response(
                 {"error": "Query parameter is unknown"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    
-    """
-    curl -X POST "http://localhost:9200/user_index/_search?pretty" -H "Content-Type: application/json" -d '{
-        "query": {
-            "match": {
-            "query": "q",
-            "fields": ["full_name", "username", "profile.bio"]
-            }
-        }
-    }'
-
-    search_query = search.query("nested", 
-                                        path="profile.categories", 
-                                        query=Q("match", profile__categories=query))
-            response = search_query.execute()
-    """
-    
-
 
 class SearchBlogView(APIView):
     def get(self, request):
+
+        # gell all blogs by sorting like_count and comment_count
         if not bool(request.query_params):
             search = BlogIndex.search().query("match_all").sort(
                 {"like_count": {"order": "desc"}},
@@ -111,6 +139,7 @@ class SearchBlogView(APIView):
                 status=status.HTTP_200_OK
             )
         
+        # search with keyword in title, description and content
         if request.query_params.get("keyword"):
             query = request.query_params.get("keyword")
             search = BlogIndex.search().query(
@@ -126,22 +155,26 @@ class SearchBlogView(APIView):
                 status=status.HTTP_200_OK
             )
         
+        # gets all blogs by specific category
         elif request.query_params.get("category"):
             query = request.query_params.get("category")  
 
             search_query =  BlogIndex.search().query(
                                                 "nested", 
                                                 path="categories", 
-                                                query=Q("term", categories__name=query.capitalize())) # term, match, wildcard, case sensitive slug kullanılacak
-                                                # query=Q("match_all"))
+                                                query=Q("term", 
+                                                        categories__name=query.capitalize())).sort(
+                                                                {"like_count": {"order": "desc"}},
+                                                                {"comment_count": {"order": "desc"}}
+                                                            )
+            # term, match, wildcard, case sensitive slug kullanılacak
+            # query=Q("match_all"))
             results = search_query.execute()
 
             return Response(
                 # {"results": [hit.to_dict() for hit in results]},
                 {"results": results.to_dict()},
                 status=status.HTTP_200_OK)
-        
-        # belli bir kullanıcının bloglarında category'lerine göre arama yapma
 
         else:
             return Response(
@@ -163,32 +196,24 @@ class SearchBlogView(APIView):
   ]
 }
 """
+
+
     
+"""
+    curl -X POST "http://localhost:9200/user_index/_search?pretty" -H "Content-Type: application/json" -d '{
+        "query": {
+            "match": {
+            "query": "q",
+            "fields": ["full_name", "username", "profile.bio"]
+            }
+        }
+    }'
 
-class SearchCategoryView(APIView):
-    def get(self, request):
-        q = request.GET.get("tag")
-        if not q:
-            return Response(
-                {"error": "Query parameter 'tag' is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        search = BlogIndex.search().query(
-            "nested", 
-            path="categories", 
-            query=Q("match", categories__name=q)
-            # **{'address.city': 'prague'}
-        ).sort(
-            {"like_count": {"order": "desc"}},
-            {"comment_count": {"order": "desc"}}
-        )
-        results = search.execute()
-
-        return Response(
-            # {"results": [hit.to_dict() for hit in results]},
-            {"results": results.to_dict()},
-            status=status.HTTP_200_OK
-        )
+    search_query = search.query("nested", 
+                                        path="profile.categories", 
+                                        query=Q("match", profile__categories=query))
+            response = search_query.execute()
+"""
     
 
 
